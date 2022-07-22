@@ -1,0 +1,34 @@
+name: 'mGBA ROM Test'
+description: 'Unit testing for Game Boy Advance ROMs'
+inputs:
+  swi-call:
+    description: 'Software Interrupt that ends the test'
+    required: true
+    default: 3
+  read-register:
+    description: 'General purpose register to return as exit code'
+    required: true
+    default: 'r0'
+  rom-path:
+    description: 'Game Boy Advance ROM path'
+    required: true
+  success-code:
+    description: 'Expected value in read-register'
+    required: false
+    default: 0
+outputs:
+  exitcode:
+    description: 'Test exit code'
+    value: ${{ steps.mgba-rom-test.outputs.exitcode }}
+runs:
+  using: "composite"
+  steps:
+    - id: mgba-rom-test
+      shell: bash
+      run: |
+        set +e
+        bin/ubuntu/mgba-rom-test -S ${{ inputs.swi-call }} -R ${{ inputs.read-register }} ${{ inputs.rom-path }}
+        rom_test_exitcode=$?
+        set -e
+        echo "::set-output name=exitcode::$rom_test_exitcode"
+        if [[ $rom_test_exitcode == ${{ inputs.success-code }} ]]; then exit 0; else exit 1; fi

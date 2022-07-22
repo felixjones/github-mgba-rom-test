@@ -1,0 +1,18 @@
+on: [push]
+
+jobs:
+  test-rom:
+    runs-on: ubuntu-latest
+    name: Test a GBA ROM
+    steps:
+      - uses: actions/checkout@v3
+      - id: test-2x3
+        uses: felixjones/github-mgba-rom-test@v1
+        with:
+          swi-call: 3
+          read-register: 'r0'
+          rom-path: 'rom/testRom.gba'
+          success-code: 6
+      - run: |
+          echo "2 x 3 = ${{ steps.test-2x3.outputs.exitcode }}"
+        shell: bash
