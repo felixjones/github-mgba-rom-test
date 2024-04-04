@@ -30,5 +30,5 @@ runs:
         ${{github.action_path}}/bin/ubuntu/mgba-rom-test -S ${{ inputs.swi-call }} -R ${{ inputs.read-register }} ${{ inputs.rom-path }}
         rom_test_exitcode=$?
         set -e
-        echo "::set-output name=exitcode::$rom_test_exitcode"
+        echo "name=exitcode::$rom_test_exitcode" >> $GITHUB_OUTPUT
         if [[ $rom_test_exitcode == ${{ inputs.success-code }} ]]; then exit 0; else exit 1; fi
