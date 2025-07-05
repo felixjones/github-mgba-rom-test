@@ -23,11 +23,29 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - id: mgba-rom-test
+    - id: download
+      shell: bash
+      run: |
+        mkdir tmp-download
+        curl -LsSf https://s3.amazonaws.com/mgba/mGBA-build-latest-ubuntu64-noble.tar.xz | tar -Jxf - -C tmp-download
+    - id: extract
+      shell: bash
+      run: |
+        mkdir mgba
+        find tmp-download/ -type f -exec mv -i {} mgba/. \;
+    - id: install
       shell: bash
       run: |
         set +e
-        ${{github.action_path}}/bin/ubuntu/mgba-rom-test -S ${{ inputs.swi-call }} -R ${{ inputs.read-register }} ${{ inputs.rom-path }}
+        sudo dpkg -i mgba/libmgba.deb
+        sudo dpkg -i mgba/mgba-headless.deb
+        set -e
+        sudo apt-get install -f
+    - id: mgba-headless
+      shell: bash
+      run: |
+        set +e
+        mgba-headless -S ${{ inputs.swi-call }} -R ${{ inputs.read-register }} ${{ inputs.rom-path }}
         rom_test_exitcode=$?
         set -e
         echo "name=exitcode::$rom_test_exitcode" >> $GITHUB_OUTPUT
