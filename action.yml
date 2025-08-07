@@ -40,7 +40,7 @@ runs:
         sudo dpkg -i mgba/libmgba.deb
         sudo dpkg -i mgba/mgba-headless.deb
         set -e
-        sudo apt-get install -f
+        sudo apt-get update && sudo apt-get install -f
     - id: mgba-headless
       shell: bash
       run: |
